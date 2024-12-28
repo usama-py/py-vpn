@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  vpn_server:
+    build:
+      context: .
+      dockerfile: vpn_server.Dockerfile
+    container_name: vpn_server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server.crt:/app/server.crt  # Certificate file for SSL
+      - ./server.key:/app/server.key  # Private key for SSL
+    networks:
+      - vpn_network
+
+  vpn_tunnel:
+    container_name: vpn_tunnel
+    build:
+      context: .
+      dockerfile: vpn_tunnel.Dockerfile
+    depends_on:
+      - vpn_server
+    ports:
+      - "8080:8080"
+    networks:
+      - vpn_network
+    volumes:
+      - ./server.crt:/app/server.crt  # Certificate file for SSL
+    stdin_open: true
+    tty: true
+
+  vpn_client:
+    build: .
+    container_name: vpn_client
+    depends_on:
+      - vpn_tunnel
+    networks:
+      - vpn_network
+    entrypoint: ["python", "vpn_client.py"]
+    stdin_open: true
+    tty: true
+
+networks:
+  vpn_network:
+    driver: bridge
