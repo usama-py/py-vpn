@@ -5,7 +5,7 @@ import threading
 # Configuration
 LISTEN_HOST = '0.0.0.0'  # Listen on all available interfaces
 LISTEN_PORT = 8080       # Port to listen for incoming connections
-SERVER_HOST = 'vpn_server'  # VPN server host
+SERVER_HOST = 'host.docker.internal'  # VPN server host
 SERVER_PORT = 8000           # VPN server port
 
 # SSL context for securing the connection to the VPN server

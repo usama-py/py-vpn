@@ -47,13 +47,14 @@ Simple vpn simulation with python and docker
 
 - Generate SSL Certificates (if you haven't already):
 
-```openssl genpkey -algorithm RSA -out server.key```
-```openssl req -new -key server.key -out server.csr```
-```openssl x509 -req -in server.csr -signkey server.key -out server.crt```
+- ```openssl genpkey -algorithm RSA -out server.key```
+- ```openssl req -new -key server.key -out server.csr```
+- IMPORTANT NOTE: You would need to specify `host.docker.internal` when asked for `Common Name` while generating `server.key` (Might change or fix this later)
+- ```openssl x509 -req -in server.csr -signkey server.key -out server.crt```
 
 - Build and Start Docker Containers:
-```docker-compose build ```
-```docker-compose up```
+- ```docker-compose build ```
+- ```docker-compose up```
 
 ## License
 

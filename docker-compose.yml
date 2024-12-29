@@ -11,14 +11,15 @@ services:
     volumes:
       - ./server.crt:/app/server.crt  # Certificate file for SSL
       - ./server.key:/app/server.key  # Private key for SSL
+      - ./vpn_server.py:/app/vpn_server.py:cached  # Mount the vpn_server script directly
     networks:
-      - vpn_network
+      - vpn_network_server  # Use a different network for vpn_server
 
   vpn_tunnel:
-    container_name: vpn_tunnel
     build:
       context: .
       dockerfile: vpn_tunnel.Dockerfile
+    container_name: vpn_tunnel
     depends_on:
       - vpn_server
     ports:
@@ -27,6 +28,7 @@ services:
       - vpn_network
     volumes:
       - ./server.crt:/app/server.crt  # Certificate file for SSL
+      - ./vpn_tunnel.py:/app/vpn_tunnel.py:cached  # Mount the vpn_tunnel script directly
     stdin_open: true
     tty: true
 
@@ -36,11 +38,16 @@ services:
     depends_on:
       - vpn_tunnel
     networks:
-      - vpn_network
-    entrypoint: ["python", "vpn_client.py"]
+      - vpn_network  # Keep vpn_client on the original network
+    volumes:
+      - ./vpn_client.py:/app/vpn_client.py:cached  # Mount the vpn_client script directly
+    entrypoint: ["python", "/app/vpn_client.py"]
     stdin_open: true
     tty: true
 
 networks:
-  vpn_network:
+  vpn_network:          # Original network for vpn_tunnel and vpn_client
+    driver: bridge
+
+  vpn_network_server:   # New separate network for vpn_server
     driver: bridge
